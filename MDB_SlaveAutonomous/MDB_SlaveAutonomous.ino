@@ -1,7 +1,7 @@
 #include "MDB.h"
 #include <SPI.h>
 #include <Ethernet.h>
-#include <MFRC522.h>
+//#include <MFRC522.h>
 #include <SoftwareSerial.h>
 // SoftwareSerial pins for debugging
 #define RX_DEBUG_PIN    6
@@ -11,14 +11,14 @@ SoftwareSerial Debug(RX_DEBUG_PIN, TX_DEBUG_PIN);
 
 // SPI Slaves Settings
 #define RESET_PIN       9     // SPI RESET Pin
-#define SS_PIN_RC522    8     // MFRC522 SS Pin
+//#define SS_PIN_RC522    8     // MFRC522 SS Pin
 #define SS_PIN_SDCRD    4     // SD Card SS Pin (ethernet shield SD card)
 #define SS_PIN_W5100    10    // W5100   SS Pin (ethernet shield Ethernet)
 
 typedef enum {RC522, SDCARD, W5100} SPISlave;  // For function 'enableSPISlave(SPISlave slave)'
 
 // Create MFRC522 instance
-MFRC522 mfrc522(SS_PIN_RC522, RESET_PIN);
+//MFRC522 mfrc522(SS_PIN_RC522, RESET_PIN);
 // String object for containing HEX represented UID
 String uid_str_obj = "";
 /*
@@ -52,8 +52,8 @@ void setup() {
     
     Debug.println(F("Ethernet ON"));
     // Init MFRC522 RFID reader
-    enableSPISlave(RC522);
-    mfrc522.PCD_Init();
+    //enableSPISlave(RC522);
+    //mfrc522.PCD_Init();
 }
 
 void loop() {
@@ -98,6 +98,8 @@ void sessionHandler(void)
  */
 void RFID_readerHandler(void)
 {
+
+  /*
     String new_uid_str_obj;
     // String objects and indexes for parsing HTTP Response
     String http_response;
@@ -107,11 +109,11 @@ void RFID_readerHandler(void)
     uint16_t user_funds = 0;
     // Look for new cards
     enableSPISlave(RC522);
-    if ( ! mfrc522.PICC_IsNewCardPresent())
-        return;
+    //if ( ! mfrc522.PICC_IsNewCardPresent())
+        //return;
     // Select one of the cards
-    if ( ! mfrc522.PICC_ReadCardSerial())
-        return;
+    //if ( ! mfrc522.PICC_ReadCardSerial())
+        //return;
     
     new_uid_str_obj = "";
     getUIDStrHex(&mfrc522, &new_uid_str_obj);
@@ -243,7 +245,8 @@ void transactionHandler(void)
  *       
  * changes the String &uid_str object by pointer, considered as output
  */
-void getUIDStrHex(MFRC522 *card, String *uid_str)
+ void getUIDStrHex(){}
+/*void getUIDStrHex(MFRC522 *card, String *uid_str)
 {
     char uuid_str[2 * card->uid.size];
     
@@ -259,7 +262,7 @@ void getUIDStrHex(MFRC522 *card, String *uid_str)
      *  0x00 to 0x09 digits become '0' to '9' chars (add 0x30)
      *  0x0A to 0x0F digits become 'A' to 'F' chars in UPPERCASE (add 0x41 and subtract 0x0A)
      *  Last thing is to copy that into a String object, which is easier to handle
-     */
+     
     for (byte i = 0; i < 2 * card->uid.size; ++i)
     {
         if (uuid_str[i] < 0x0A)
@@ -268,7 +271,7 @@ void getUIDStrHex(MFRC522 *card, String *uid_str)
             uuid_str[i] = (uuid_str[i] - 0x0A + 0x41);
         *uid_str += uuid_str[i];
     }
-}
+}*/
 
 /* 
  * 20-02-2016
@@ -282,8 +285,8 @@ void enableSPISlave(SPISlave slave)
     {
         case RC522 :
         {
-            pinMode(SS_PIN_RC522, OUTPUT);
-            digitalWrite(SS_PIN_RC522, LOW);
+            //pinMode(SS_PIN_RC522, OUTPUT);
+            //digitalWrite(SS_PIN_RC522, LOW);
             digitalWrite(SS_PIN_SDCRD, HIGH);
             digitalWrite(SS_PIN_W5100, HIGH);
             break;
@@ -292,7 +295,7 @@ void enableSPISlave(SPISlave slave)
         {
             pinMode(SS_PIN_SDCRD, OUTPUT);
             digitalWrite(SS_PIN_SDCRD, LOW);
-            digitalWrite(SS_PIN_RC522, HIGH);
+            //digitalWrite(SS_PIN_RC522, HIGH);
             digitalWrite(SS_PIN_W5100, HIGH);
             break;
         }
@@ -300,7 +303,7 @@ void enableSPISlave(SPISlave slave)
         {
             pinMode(SS_PIN_W5100, OUTPUT);
             digitalWrite(SS_PIN_W5100, LOW);
-            digitalWrite(SS_PIN_RC522, HIGH);
+            //digitalWrite(SS_PIN_RC522, HIGH);
             digitalWrite(SS_PIN_SDCRD, HIGH);
             break;
         }
