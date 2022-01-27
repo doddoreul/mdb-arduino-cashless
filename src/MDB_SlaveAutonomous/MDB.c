@@ -6,7 +6,7 @@ VMC_Config_t vmc_config = {0, 0, 0, 0};
 VMC_Prices_t vmc_prices = {0, 0};
 
  // Available user funds, changed via server connection in the Enabled state
-uint16_t user_funds  = 0x0000;
+uint16_t user_funds  = 0x0000; // 0x4120 for 10, 0x0000 for 0
 // Selected item price,  changed via VMC_VEND_REQUEST
 uint16_t item_cost   = 0x0000;
 // Selected item amount, changed via VMC_VEND_REQUEST

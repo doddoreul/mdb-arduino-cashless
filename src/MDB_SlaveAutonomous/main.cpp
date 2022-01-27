@@ -91,6 +91,35 @@ void loop() {
  */
 void sessionHandler(void)
 {
+    String http_response;
+    String http_code;
+    uint8_t start_index = 0;
+    uint8_t end_index = 0;
+    uint16_t user_funds = 0;
+
+    while (true)
+    {
+        if (server.available())
+            http_response += (char)server.read();
+        else if (!server.connected())
+        {
+            server.stop();
+            break;
+        }
+    }
+
+    // Now parse for funds available
+    start_index = http_response.indexOf('\"') + 1; // +1, or we going to start with \" symbol
+    end_index   = http_response.indexOf('\"', start_index);
+    user_funds  = http_response.substring(start_index, end_index).toInt(); 
+    Debug.println(http_response);
+    Debug.print(F("Funds: "));
+    Debug.println(user_funds);
+    
+    Debug.println(F("Poll State: Begin Session"));
+    CSH_SetUserFunds(user_funds); // Set current user funds
+    CSH_SetPollState(CSH_BEGIN_SESSION); // Set Poll Reply to BEGIN SESSION
+
     switch(CSH_GetDeviceState())
     {
         case CSH_S_ENABLED : RFID_readerHandler(); break;
@@ -111,8 +140,7 @@ void sessionHandler(void)
  */
 void RFID_readerHandler(void)
 {
-
-  /*
+    /*
     String new_uid_str_obj;
     // String objects and indexes for parsing HTTP Response
     String http_response;
