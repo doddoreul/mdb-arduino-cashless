@@ -30,8 +30,8 @@ String uid_str_obj = "";
 uint8_t client_mac[] = {
     0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02
 };
-IPAddress client_ip(192, 168, 137, 232); // Static IP Mode in case of failed DHCP Mode
-IPAddress server_address(192, 168, 1, 139);
+IPAddress client_ip(172, 16, 42, 253); // Static IP Mode in case of failed DHCP Mode
+IPAddress server_address(172, 16, 42, 139); // Server's address (for api calls, see https://github.com/LanguidSmartass/mdb-arduino-cashless/issues/19)
 uint16_t server_port = 8888;
 EthernetClient server;
 
