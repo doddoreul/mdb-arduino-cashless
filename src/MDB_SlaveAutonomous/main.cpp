@@ -43,18 +43,21 @@ void RFID_readerHandler(void);
 void transactionHandler(void);
 void getUIDStrHex();
 void enableSPISlave(SPISlave slave);
+//void getUIDStrHex(MFRC522 *card, String *uid_str);
 
 void setup() {
     // For debug LEDs
     DDRC |= 0b00111111; // PORTC LEDs for 6 commands in MDB_CommandHandler() switch-case
     Debug.begin(9600);
     MDB_Init();
-    sei();    
+    sei();   
+
     // Init Ethernet Shield    
     enableSPISlave(W5100);
-    if (Ethernet.begin(client_mac) == 0)  // Start in DHCP Mode
+    if (Ethernet.begin(client_mac) == 0){  // Start in DHCP Mode
         Ethernet.begin(client_mac, client_ip); // If DHCP Mode failed, start in Static Mode
-    
+    }
+
     // Give the Ethernet shield a second to initialize:
     delay(1000);
     unsigned long start_time = millis();
@@ -66,7 +69,7 @@ void setup() {
 }
 
 void loop() {
-//    Debug.println(MDB_DataCount());
+    Debug.println(MDB_DataCount());
     MDB_CommandHandler();
     sessionHandler();
     // without this delay READER_ENABLE command won't be in RX Buffer
@@ -98,6 +101,7 @@ void sessionHandler(void)
 //    if (c == 0x30)
 //        CSH_SetPollState(CSH_END_SESSION);
 }
+
 /*
  * Waiting for RFID tag routine
  * I a new card is detected and it is present in the server's database,
@@ -183,6 +187,7 @@ void RFID_readerHandler(void)
      * SET FUNDS AND CONNECTION TIMEOUT SOMEWHERE, TO CANCEL SESSION AFTER 5 SECONDS !!!
      */
 }
+
 /*
  * Transaction routine
  * At this point item_cost and item_number (or vend_amount)
@@ -255,6 +260,7 @@ void transactionHandler(void)
  * changes the String &uid_str object by pointer, considered as output
  */
  void getUIDStrHex(){}
+
 /*void getUIDStrHex(MFRC522 *card, String *uid_str)
 {
     char uuid_str[2 * card->uid.size];
