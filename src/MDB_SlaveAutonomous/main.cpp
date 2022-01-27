@@ -37,6 +37,13 @@ IPAddress server_address(172, 16, 42, 139); // Server's address (for api calls, 
 uint16_t server_port = 8888;
 EthernetClient server;
 
+/* Declaring all functions */ 
+void sessionHandler(void);
+void RFID_readerHandler(void);
+void transactionHandler(void);
+void getUIDStrHex();
+void enableSPISlave(SPISlave slave);
+
 void setup() {
     // For debug LEDs
     DDRC |= 0b00111111; // PORTC LEDs for 6 commands in MDB_CommandHandler() switch-case
