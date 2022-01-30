@@ -33,7 +33,7 @@ uint8_t client_mac[] = {
       0x00, 0xAA, 0xBB, 0xCC, 0xDE, 0x02
 };
 IPAddress client_ip(172, 16, 42, 126); // Static IP Mode in case of failed DHCP Mode
-IPAddress server_address(172, 16, 42, 139); // Server's address (for api calls, see https://github.com/LanguidSmartass/mdb-arduino-cashless/issues/19)
+IPAddress server_address(172, 16, 42, 220); // Server's address (for api calls, see https://github.com/LanguidSmartass/mdb-arduino-cashless/issues/19)
 uint16_t server_port = 8888;
 EthernetClient server;
 
@@ -60,7 +60,6 @@ void setup() {
 
     // Give the Ethernet shield a second to initialize:
     delay(1000);
-    unsigned long start_time = millis();
     
     Debug.println(F("Ethernet ON"));
     // Init MFRC522 RFID reader
@@ -69,19 +68,20 @@ void setup() {
 }
 
 void loop() {
-    Debug.println(MDB_DataCount());
+    //Debug.println(MDB_DataCount());
     MDB_CommandHandler();
     sessionHandler();
+
     // without this delay READER_ENABLE command won't be in RX Buffer
     // Establish the reason of this later (maybe something is wrong with RX buffer reading)
     if (CSH_GetDeviceState() == CSH_S_DISABLED)
         delay(10);
-//    switch (c)
-//    {
-//        case 0x30 : CSH_SetPollState(CSH_SESSION_CANCEL_REQUEST); break;
-//        case 0x31 : CSH_SetPollState(CSH_END_SESSION);    break;
-//        default : break;
-//    }        
+    //    switch (c)
+    //    {
+    //        case 0x30 : CSH_SetPollState(CSH_SESSION_CANCEL_REQUEST); break;
+    //        case 0x31 : CSH_SetPollState(CSH_END_SESSION);    break;
+    //        default : break;
+    //    }        
 }
 
 /*
@@ -97,6 +97,17 @@ void sessionHandler(void)
     uint8_t end_index = 0;
     uint16_t user_funds = 0;
 
+    enableSPISlave(W5100);
+    if (server.connect(server_address, server_port))
+    {
+        // Make HTTP request
+        server.print(F("GET /api/getrecord/"));
+        server.print(uid_str_obj);
+        server.print(F("/Funds"));
+        server.println(F(" HTTP/1.1"));
+        server.println();
+    }
+
     while (true)
     {
         if (server.available())
@@ -111,8 +122,10 @@ void sessionHandler(void)
     // Now parse for funds available
     start_index = http_response.indexOf('\"') + 1; // +1, or we going to start with \" symbol
     end_index   = http_response.indexOf('\"', start_index);
-    user_funds  = http_response.substring(start_index, end_index).toInt(); 
-    Debug.println(http_response);
+    //user_funds  = http_response.substring(start_index, end_index).toInt();
+    //Debug.println(http_response);
+    
+    user_funds = 0x0FA0; //temp 
     Debug.print(F("Funds: "));
     Debug.println(user_funds);
     
@@ -126,9 +139,9 @@ void sessionHandler(void)
         case CSH_S_VEND    : transactionHandler(); break;
         default : break;
     }
-//    char c = Debug.read();
-//    if (c == 0x30)
-//        CSH_SetPollState(CSH_END_SESSION);
+    //    char c = Debug.read();
+    //    if (c == 0x30)
+    //        CSH_SetPollState(CSH_END_SESSION);
 }
 
 /*
